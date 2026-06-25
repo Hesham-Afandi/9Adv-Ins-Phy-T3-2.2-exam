@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎢 Grade 12 Advanced Physics - Centripetal Force & Acceleration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        body.en-mode { font-family: 'Inter', sans-serif; }
+        .correct { background-color: #dcfce7 !important; border-color: #16a34a !important; }
+        .incorrect { background-color: #fee2e2 !important; border-color: #dc2626 !important; }
+        .formula { font-family: 'Times New Roman', serif; letter-spacing: 0.5px; direction: ltr; display: inline-block; font-style: italic; }
+        .timer-warning { color: #dc2626 !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 50% { opacity: 0.7; } }
+        @media print { .no-print { display: none !important; } }
+        .success-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.875rem; }
+        .grade-excellent { background: #dcfce7; color: #166534; }
+        .grade-good { background: #fef3c7; color: #92400e; }
+        .grade-pass { background: #dbeafe; color: #1e40af; }
+        .grade-fail { background: #fee2e2; color: #991b1b; }
+        .lang-switch {
+            position: fixed; top: 16px; left: 16px; z-index: 100;
+            background: white; padding: 6px; border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; gap: 4px;
+            border: 2px solid #059669;
+        }
+        [dir="ltr"] .lang-switch { left: auto; right: 16px; }
+        .lang-btn {
+            padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: bold;
+            transition: all 0.3s; border: none; font-size: 0.875rem;
+            background: transparent; color: #6b7280;
+        }
+        .lang-btn.active { background: #059669; color: white; box-shadow: 0 2px 6px rgba(5,150,105,0.4); }
+        .lang-btn:hover:not(.active) { background: #ecfdf5; color: #059669; }
+        .shuffle-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 md:p-8 min-h-screen">
+
+    <div class="lang-switch no-print">
+        <button class="lang-btn active" onclick="setLanguage('ar')" id="btn-ar">عربي</button>
+        <button class="lang-btn" onclick="setLanguage('en')" id="btn-en">EN</button>
+    </div>
+
+    <div id="timer-container" class="max-w-4xl mx-auto mb-4 text-center no-print">
+        <div class="bg-white p-4 rounded-xl shadow-md inline-block border-2 border-emerald-100">
+            <span class="text-gray-600 ml-2" data-ar="⏱️ الوقت المتبقي:" data-en="⏱️ Time Remaining:">⏱️ الوقت المتبقي:</span>
+            <span id="timer" class="text-2xl font-bold text-emerald-600 font-mono">60:00</span>
+            <span class="shuffle-badge" data-ar="🔀 أسئلة عشوائية" data-en="🔀 Random Questions">🔀 أسئلة عشوائية</span>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto mb-6 flex flex-wrap gap-3 justify-center no-print">
+        <button onclick="toggleAnswers()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar="👁️ إظهار / إخفاء الإجابات" data-en="👁️ Show / Hide Answers">👁️ إظهار / إخفاء الإجابات</button>
+        <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar="🖨️ طباعة / PDF" data-en="🖨️ Print / PDF">🖨️ طباعة / PDF</button>
+        <button onclick="reshuffleExam()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar="🔀 إعادة خلط الأسئلة" data-en="🔀 Reshuffle Questions">🔀 إعادة خلط الأسئلة</button>
+    </div>
+
+    <header class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-md mb-8 border-r-4 border-emerald-600">
+        <div class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2" data-ar="🎢 فيزياء الصف الثاني عشر المتقدم" data-en="🎢 Grade 12 Advanced Physics">🎢 فيزياء الصف الثاني عشر المتقدم</h1>
+            <h2 class="text-lg text-emerald-600 font-semibold" data-ar="القوة والعجلة المركزية: من المنعطفات إلى الألعاب" data-en="Centripetal Force & Acceleration: From Curves to Amusement Rides">القوة والعجلة المركزية: من المنعطفات إلى الألعاب</h2>
+            <p class="text-sm text-gray-600 mt-2" data-ar="F_c = mv²/r، المنعطفات المائلة، Rotor، الحركة الرأسية، وسباقات F1" data-en="F_c = mv²/r, Banked Curves, Rotor, Vertical Motion & F1 Racing">F_c = mv²/r، المنعطفات المائلة، Rotor، الحركة الرأسية، وسباقات F1</p>
+            <p class="text-xs text-orange-600 mt-2 font-semibold" data-ar="⚠️ ملاحظة: يتم خلط ترتيب الأسئلة والخيارات تلقائياً مع كل تحديث للصفحة" data-en="⚠️ Note: Questions and options are randomly shuffled on every page refresh">⚠️ ملاحظة: يتم خلط ترتيب الأسئلة والخيارات تلقائياً مع كل تحديث للصفحة</p>
+        </div>
+        <div class="mt-4 flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+            <span><span data-ar="📅 التاريخ:" data-en="📅 Date:">📅 التاريخ:</span> <input type="text" class="border-b border-gray-400 bg-transparent w-28 text-center"></span>
+            <span><span data-ar="👤 الاسم:" data-en="👤 Name:">👤 الاسم:</span> <input type="text" id="studentName" class="border-b border-gray-400 bg-transparent w-32 text-center" placeholder="Enter name"></span>
+            <span><span data-ar="🏫 الشعبة:" data-en="🏫 Class:">🏫 الشعبة:</span> <input type="text" id="studentClass" class="border-b border-gray-400 bg-transparent w-28 text-center" placeholder="Class"></span>
+            <span><span data-ar="⏱️ المدة: 60 دقيقة" data-en="⏱️ Duration: 60 min">⏱️ المدة: 60 دقيقة</span></span>
+            <span><span data-ar="📊 المجموع: 100 درجة" data-en="📊 Total: 100 pts">📊 المجموع: 100 درجة</span></span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto space-y-8" id="exam-content"></main>
+
+    <div class="text-center no-print pb-8 mt-8">
+        <button onclick="gradeExam()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-10 py-4 rounded-xl font-bold shadow-xl transition transform hover:scale-105 cursor-pointer" data-ar="📝 تسليم وتصحيح الامتحان" data-en="📝 Submit & Grade Exam">📝 تسليم وتصحيح الامتحان</button>
+    </div>
+
+    <div id="results-panel" class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-2xl shadow-2xl border-t-4 border-emerald-500 hidden no-print">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center" data-ar="📊 نتائج الامتحان" data-en="📊 Exam Results">📊 نتائج الامتحان</h2>
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-xl text-center"><p data-ar="اسم الطالب" data-en="Student Name">اسم الطالب</p><p id="res-name" class="font-bold text-xl text-emerald-700">-</p></div>
+            <div class="bg-purple-50 p-4 rounded-xl text-center"><p data-ar="التاريخ" data-en="Date">التاريخ</p><p id="res-date" class="font-bold text-xl text-purple-700">-</p></div>
+            <div class="bg-emerald-50 p-4 rounded-xl text-center"><p data-ar="المجموع" data-en="Score">المجموع</p><p id="res-total" class="font-bold text-3xl text-emerald-600">0 / 100</p></div>
+        </div>
+        <div class="text-center mb-6">
+            <span id="success-badge" class="success-badge grade-excellent">-</span>
+            <p id="success-percent" class="text-4xl font-bold text-emerald-600 mt-2">100%</p>
+            <p class="text-sm text-gray-500" data-ar="نسبة النجاح" data-en="Success Rate">نسبة النجاح</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-xl mb-6">
+            <h3 class="font-bold text-lg mb-4 text-gray-800" data-ar="📈 تفصيل الأداء حسب القسم:" data-en="📈 Performance Breakdown:">📈 تفصيل الأداء حسب القسم:</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="أساسيات القوة والعجلة المركزية" data-en="Fundamentals of Centripetal Force & Acceleration">أساسيات القوة والعجلة المركزية</span><span id="sec1-score" class="font-bold text-emerald-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="المنعطفات المسطحة والاحتكاك" data-en="Flat Curves & Friction">المنعطفات المسطحة والاحتكاك</span><span id="sec2-score" class="font-bold text-emerald-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="المنعطفات المائلة (Banked Curves)" data-en="Banked Curves">المنعطفات المائلة (Banked Curves)</span><span id="sec3-score" class="font-bold text-emerald-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="الحركة الدائرية الرأسية" data-en="Vertical Circular Motion">الحركة الدائرية الرأسية</span><span id="sec4-score" class="font-bold text-emerald-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="تطبيقات متقدمة (Rotor & F1)" data-en="Advanced Applications (Rotor & F1)">تطبيقات متقدمة (Rotor & F1)</span><span id="sec5-score" class="font-bold text-emerald-600">0/4</span></div>
+            </div>
+        </div>
+        <div class="text-center mb-6">
+            <button id="sendEmailBtn" onclick="sendResultsToEmail()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-8 py-3 rounded-xl font-bold shadow-xl transition transform hover:scale-105 cursor-pointer" data-ar="📧 إرسال النتائج للمعلم" data-en="📧 Send Results to Teacher">📧 إرسال النتائج للمعلم</button>
+            <p id="emailStatus" class="text-sm mt-2 text-center font-medium"></p>
+        </div>
+        <div class="flex gap-3 justify-center">
+            <button onclick="window.print()" class="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold" data-ar="🖨️ طباعة النتائج" data-en="🖨️ Print Results">🖨️ طباعة النتائج</button>
+        </div>
+    </div>
+
+    <footer class="max-w-4xl mx-auto mt-10 mb-8 text-center text-gray-500 text-sm no-print">
+        © <span data-ar="الفيزياء للصف 12 متقدم | القوة والعجلة المركزية" data-en="Grade 12 Advanced Physics | Centripetal Force & Acceleration">الفيزياء للصف 12 متقدم | القوة والعجلة المركزية</span> | Mr. Mohammed Hesham
+    </footer>
+
+<script>
+const originalExamData = {
+    sections: [
+        {
+            id: 'sec1',
+            title: { ar: '🔹 الجزء الأول: أساسيات القوة والعجلة المركزية', en: '🔹 Part 1: Fundamentals of Centripetal Force & Acceleration' },
+            questions: [
+                { q: { ar: 'العجلة المركزية <span class="math">(a_c)</span> تُحسب من العلاقة:', en: 'Centripetal acceleration <span class="math">(a_c)</span> is calculated from:' }, options: [{ ar: '<span class="math">a_c = v/r</span>', en: '<span class="math">a_c = v/r</span>' }, { ar: '<span class="math">a_c = v²/r = ω²r</span>', en: '<span class="math">a_c = v²/r = ω²r</span>' }, { ar: '<span class="math">a_c = vr</span>', en: '<span class="math">a_c = vr</span>' }, { ar: '<span class="math">a_c = r/v²</span>', en: '<span class="math">a_c = r/v²</span>' }], correct: 1, answer: { ar: 'a_c = v²/r أو a_c = ω²r (صيغتان متكافئتان)', en: 'a_c = v²/r or a_c = ω²r (two equivalent formulas)' } },
+                { q: { ar: 'القوة المركزية <span class="math">(F_c)</span> تُحسب من:', en: 'Centripetal force <span class="math">(F_c)</span> is calculated from:' }, options: [{ ar: '<span class="math">F_c = mv/r</span>', en: '<span class="math">F_c = mv/r</span>' }, { ar: '<span class="math">F_c = mv²/r = mω²r</span>', en: '<span class="math">F_c = mv²/r = mω²r</span>' }, { ar: '<span class="math">F_c = mvr</span>', en: '<span class="math">F_c = mvr</span>' }, { ar: '<span class="math">F_c = mω/r</span>', en: '<span class="math">F_c = mω/r</span>' }], correct: 1, answer: { ar: 'F_c = ma_c = mv²/r = mω²r', en: 'F_c = ma_c = mv²/r = mω²r' } },
+                { q: { ar: 'اتجاه العجلة المركزية دائماً:', en: 'The direction of centripetal acceleration is always:' }, options: [{ ar: 'في اتجاه الحركة', en: 'In the direction of motion' }, { ar: 'نحو مركز الدائرة', en: 'Toward the center of the circle' }, { ar: 'بعيداً عن المركز', en: 'Away from the center' }, { ar: 'عمودياً على مستوى الحركة', en: 'Perpendicular to the plane of motion' }], correct: 1, answer: { ar: 'العجلة المركزية تتجه دائماً نحو المركز (بسبب تغير اتجاه السرعة)', en: 'Centripetal acceleration always points toward the center (due to change in velocity direction)' } },
+                { q: { ar: 'سيارة كتلتها <span class="math">1000 kg</span> تتحرك في مسار دائري نصف قطره <span class="math">50 m</span> بسرعة <span class="math">20 m/s</span>. القوة المركزية:', en: 'A car of mass <span class="math">1000 kg</span> moves in a circular path of radius <span class="math">50 m</span> at <span class="math">20 m/s</span>. The centripetal force:' }, options: [{ ar: '<span class="math">4000 N</span>', en: '<span class="math">4000 N</span>' }, { ar: '<span class="math">8000 N</span>', en: '<span class="math">8000 N</span>' }, { ar: '<span class="math">20,000 N</span>', en: '<span class="math">20,000 N</span>' }, { ar: '<span class="math">400 N</span>', en: '<span class="math">400 N</span>' }], correct: 1, answer: { ar: 'F_c = mv²/r = 1000 × 400/50 = 8000 N', en: 'F_c = mv²/r = 1000 × 400/50 = 8000 N' } }
+            ]
+        },
+        {
+            id: 'sec2',
+            title: { ar: '🔹 الجزء الثاني: المنعطفات المسطحة والاحتكاك', en: '🔹 Part 2: Flat Curves & Friction' },
+            questions: [
+                { q: { ar: 'في منعطف مسطح (بدون ميل)، القوة التي توفر القوة المركزية هي:', en: 'On a flat curve (without banking), the force providing centripetal force is:' }, options: [{ ar: 'القوة العمودية (Normal Force)', en: 'Normal Force' }, { ar: 'قوة الاحتكاك بين الإطارات والطريق', en: 'Friction between tires and road' }, { ar: 'الوزن (mg)', en: 'Weight (mg)' }, { ar: 'قوة الشد في المحرك', en: 'Tension in the engine' }], correct: 1, answer: { ar: 'الاحتكاك الساكن (μ_s) هو الذي يوفر F_c في المنعطفات المسطحة', en: 'Static friction (μ_s) provides F_c on flat curves' } },
+                { q: { ar: 'السرعة القصوى للسيارة في منعطف مسطح نصف قطره <span class="math">R</span> ومعامل احتكاك <span class="math">μ_s</span>:', en: 'Maximum speed for a car on a flat curve of radius <span class="math">R</span> and friction coefficient <span class="math">μ_s</span>:' }, options: [{ ar: '<span class="math">v = √(μ_s g R)</span>', en: '<span class="math">v = √(μ_s g R)</span>' }, { ar: '<span class="math">v = μ_s g R</span>', en: '<span class="math">v = μ_s g R</span>' }, { ar: '<span class="math">v = √(gR/μ_s)</span>', en: '<span class="math">v = √(gR/μ_s)</span>' }, { ar: '<span class="math">v = μ_s R</span>', en: '<span class="math">v = μ_s R</span>' }], correct: 0, answer: { ar: 'μ_s mg = mv²/R → v = √(μ_s g R)', en: 'μ_s mg = mv²/R → v = √(μ_s g R)' } },
+                { q: { ar: 'سيارة على طريق بسرعة <span class="math">90 mph (40 m/s)</span> في منعطف نصف قطره <span class="math">200 m</span> ومعامل احتكاك <span class="math">μ_s = 0.8</span>. هل ستنزلق؟', en: 'A car at <span class="math">90 mph (40 m/s)</span> on a curve of radius <span class="math">200 m</span> with <span class="math">μ_s = 0.8</span>. Will it slip?' }, options: [{ ar: 'لا، لأن السرعة أقل من السرعة القصوى المسموحة', en: 'No, because speed is below the maximum allowed' }, { ar: 'نعم، لأن القوة المطلوبة أكبر من الاحتكاك المتاح', en: 'Yes, because required force exceeds available friction' }, { ar: 'لا يمكن التحديد بدون معرفة كتلة السيارة', en: 'Cannot determine without knowing car mass' }, { ar: 'ستطير في الهواء', en: 'Will fly into the air' }], correct: 1, answer: { ar: 'F_c المطلوبة = mv²/R = m(1600/200) = 8m. الاحتكاك المتاح = μ_s mg = 0.8mg = 7.84m. بما أن 8m > 7.84m، ستنزلق', en: 'Required F_c = 8m, available friction = 7.84m. Since 8m > 7.84m, it will slip' } },
+                { q: { ar: 'في سباقات Formula 1، المنعطفات تكون مائلة لأن:', en: 'In Formula 1 racing, curves are banked because:' }, options: [{ ar: 'تقليل استهلاك الوقود', en: 'Reduce fuel consumption' }, { ar: 'السماح بسرعات أعلى دون الانزلاق', en: 'Allow higher speeds without slipping' }, { ar: 'جعل المنظر أجمل', en: 'Make the view more beautiful' }, { ar: 'تقليل وزن السيارة', en: 'Reduce car weight' }], correct: 1, answer: { ar: 'الميل يسمح لمركبة القوة العمودية بالمساهمة في القوة المركزية', en: 'Banking allows normal force component to contribute to centripetal force' } }
+            ]
+        },
+        {
+            id: 'sec3',
+            title: { ar: '🔹 الجزء الثالث: المنعطفات المائلة (Banked Curves)', en: '🔹 Part 3: Banked Curves' },
+            questions: [
+                { q: { ar: 'في منعطف مائل بزاوية <span class="math">θ</span> بدون احتكاك، السرعة المثالية هي:', en: 'On a banked curve at angle <span class="math">θ</span> without friction, the ideal speed is:' }, options: [{ ar: '<span class="math">v = √(Rg tan θ)</span>', en: '<span class="math">v = √(Rg tan θ)</span>' }, { ar: '<span class="math">v = √(Rg sin θ)</span>', en: '<span class="math">v = √(Rg sin θ)</span>' }, { ar: '<span class="math">v = √(Rg cos θ)</span>', en: '<span class="math">v = √(Rg cos θ)</span>' }, { ar: '<span class="math">v = √(Rg/tan θ)</span>', en: '<span class="math">v = √(Rg/tan θ)</span>' }], correct: 0, answer: { ar: 'N sin θ = mv²/R و N cos θ = mg → tan θ = v²/(Rg) → v = √(Rg tan θ)', en: 'N sin θ = mv²/R and N cos θ = mg → tan θ = v²/(Rg) → v = √(Rg tan θ)' } },
+                { q: { ar: 'في منعطف مائل مثالي (بدون احتكاك)، المركبة التي تسير بالسرعة المثالية:', en: 'On an ideally banked curve (no friction), a vehicle at ideal speed:' }, options: [{ ar: 'تنزلق نحو الداخل', en: 'Slips inward' }, { ar: 'تنزلق نحو الخارج', en: 'Slips outward' }, { ar: 'لا تحتاج احتكاكاً للبقاء في المسار', en: 'Needs no friction to stay on path' }, { ar: 'تحتاج قوة دفع إضافية', en: 'Needs additional thrust' }], correct: 2, answer: { ar: 'عند السرعة المثالية، المركبة المركزية تأتي بالكامل من مركبة N الأفقية', en: 'At ideal speed, centripetal force comes entirely from horizontal component of N' } },
+                { q: { ar: 'منعطف نصف قطره <span class="math">100 m</span> مائل بزاوية <span class="math">30°</span>. السرعة المثالية (g = 10 m/s²):', en: 'A curve of radius <span class="math">100 m</span> banked at <span class="math">30°</span>. Ideal speed (g = 10 m/s²):' }, options: [{ ar: '<span class="math">≈ 24 m/s</span>', en: '<span class="math">≈ 24 m/s</span>' }, { ar: '<span class="math">≈ 10 m/s</span>', en: '<span class="math">≈ 10 m/s</span>' }, { ar: '<span class="math">≈ 50 m/s</span>', en: '<span class="math">≈ 50 m/s</span>' }, { ar: '<span class="math">≈ 100 m/s</span>', en: '<span class="math">≈ 100 m/s</span>' }], correct: 0, answer: { ar: 'v = √(Rg tan θ) = √(100 × 10 × tan 30°) = √(1000 × 0.577) ≈ 24 m/s', en: 'v = √(Rg tan θ) = √(100 × 10 × 0.577) ≈ 24 m/s' } },
+                { q: { ar: 'في منعطف مائل مع وجود احتكاك، السرعة القصوى المسموحة:', en: 'On a banked curve with friction, the maximum allowed speed:' }, options: [{ ar: 'أقل من السرعة المثالية', en: 'Less than ideal speed' }, { ar: 'أكبر من السرعة المثالية (الاحتكاك يساعد)', en: 'Greater than ideal speed (friction helps)' }, { ar: 'تساوي السرعة المثالية دائماً', en: 'Always equals ideal speed' }, { ar: 'لا تعتمد على الاحتكاك', en: 'Does not depend on friction' }], correct: 1, answer: { ar: 'الاحتكاك يضيف قوة نحو المركز، مما يسمح بسرعات أعلى', en: 'Friction adds force toward center, allowing higher speeds' } }
+            ]
+        },
+        {
+            id: 'sec4',
+            title: { ar: '🔹 الجزء الرابع: الحركة الدائرية الرأسية', en: '🔹 Part 4: Vertical Circular Motion' },
+            questions: [
+                { q: { ar: 'في أعلى حلقة رأسية، الشد في الحبل (أو القوة العمودية):', en: 'At the top of a vertical loop, tension in the string (or normal force):' }, options: [{ ar: '<span class="math">T = mv²/r + mg</span>', en: '<span class="math">T = mv²/r + mg</span>' }, { ar: '<span class="math">T = mv²/r - mg</span>', en: '<span class="math">T = mv²/r - mg</span>' }, { ar: '<span class="math">T = mg - mv²/r</span>', en: '<span class="math">T = mg - mv²/r</span>' }, { ar: '<span class="math">T = mv²/r</span> فقط', en: '<span class="math">T = mv²/r</span> only' }], correct: 1, answer: { ar: 'عند القمة: F_c = T + mg → T = mv²/r - mg', en: 'At top: F_c = T + mg → T = mv²/r - mg' } },
+                { q: { ar: 'السرعة الدنيا في أعلى حلقة نصف قطرها <span class="math">r</span> (عندما T = 0):', en: 'Minimum speed at top of loop of radius <span class="math">r</span> (when T = 0):' }, options: [{ ar: '<span class="math">v = √(rg)</span>', en: '<span class="math">v = √(rg)</span>' }, { ar: '<span class="math">v = √(2rg)</span>', en: '<span class="math">v = √(2rg)</span>' }, { ar: '<span class="math">v = rg</span>', en: '<span class="math">v = rg</span>' }, { ar: '<span class="math">v = √(g/r)</span>', en: '<span class="math">v = √(g/r)</span>' }], correct: 0, answer: { ar: 'mg = mv²/r → v = √(rg) (الحد الأدنى لعدم السقوط)', en: 'mg = mv²/r → v = √(rg) (minimum to not fall)' } },
+                { q: { ar: 'في أسفل حلقة رأسية، الشد في الحبل:', en: 'At the bottom of a vertical loop, tension in the string:' }, options: [{ ar: '<span class="math">T = mv²/r - mg</span>', en: '<span class="math">T = mv²/r - mg</span>' }, { ar: '<span class="math">T = mv²/r + mg</span>', en: '<span class="math">T = mv²/r + mg</span>' }, { ar: '<span class="math">T = mg</span> فقط', en: '<span class="math">T = mg</span> only' }, { ar: '<span class="math">T = mv²/r</span> فقط', en: '<span class="math">T = mv²/r</span> only' }], correct: 1, answer: { ar: 'عند القاع: F_c = T - mg → T = mv²/r + mg (أقصى شد)', en: 'At bottom: F_c = T - mg → T = mv²/r + mg (maximum tension)' } },
+                { q: { ar: 'حلقة نصف قطرها <span class="math">10 m</span>. السرعة الدنيا في القمة (g = 10 m/s²):', en: 'A loop of radius <span class="math">10 m</span>. Minimum speed at top (g = 10 m/s²):' }, options: [{ ar: '<span class="math">10 m/s</span>', en: '<span class="math">10 m/s</span>' }, { ar: '<span class="math">≈ 14.1 m/s</span>', en: '<span class="math">≈ 14.1 m/s</span>' }, { ar: '<span class="math">100 m/s</span>', en: '<span class="math">100 m/s</span>' }, { ar: '<span class="math">≈ 7 m/s</span>', en: '<span class="math">≈ 7 m/s</span>' }], correct: 0, answer: { ar: 'v = √(rg) = √(10 × 10) = √100 = 10 m/s', en: 'v = √(rg) = √(10 × 10) = √100 = 10 m/s' } }
+            ]
+        },
+        {
+            id: 'sec5',
+            title: { ar: '🔹 الجزء الخامس: تطبيقات متقدمة (Rotor & F1)', en: '🔹 Part 5: Advanced Applications (Rotor & F1)' },
+            questions: [
+                { q: { ar: 'في لعبة Rotor (الأسطوانة الدوارة)، الشخص لا يسقط لأن:', en: 'In the Rotor ride, the person does not fall because:' }, options: [{ ar: 'الجاذبية تلغى', en: 'Gravity is canceled' }, { ar: 'قوة الاحتكاك لأعلى ≥ الوزن لأسفل', en: 'Friction upward ≥ Weight downward' }, { ar: 'الشخص يلتصق بالجدار', en: 'Person sticks to the wall' }, { ar: 'الهواء يدفعه لأعلى', en: 'Air pushes him up' }], correct: 1, answer: { ar: 'شرط عدم السقوط: μ_s N ≥ mg، حيث N = mω²r (القوة المركزية)', en: 'No-fall condition: μ_s N ≥ mg, where N = mω²r (centripetal force)' } },
+                { q: { ar: 'في لعبة Rotor، السرعة الزاوية الدنيا لمنع السقوط:', en: 'In the Rotor ride, minimum angular velocity to prevent falling:' }, options: [{ ar: '<span class="math">ω = √(g/(μ_s r))</span>', en: '<span class="math">ω = √(g/(μ_s r))</span>' }, { ar: '<span class="math">ω = √(μ_s g/r)</span>', en: '<span class="math">ω = √(μ_s g/r)</span>' }, { ar: '<span class="math">ω = √(gr)</span>', en: '<span class="math">ω = √(gr)</span>' }, { ar: '<span class="math">ω = g/(μ_s r)</span>', en: '<span class="math">ω = g/(μ_s r)</span>' }], correct: 0, answer: { ar: 'μ_s mω²r = mg → ω = √(g/(μ_s r))', en: 'μ_s mω²r = mg → ω = √(g/(μ_s r))' } },
+                { q: { ar: 'في سباقات F1، المنعطفات المائلة تسمح بـ:', en: 'In F1 racing, banked curves allow:' }, options: [{ ar: 'سرعات أقل فقط', en: 'Only lower speeds' }, { ar: 'سرعات أعلى بأمان أكبر', en: 'Higher speeds with greater safety' }, { ar: 'تقليل استهلاك الوقود فقط', en: 'Only reduce fuel consumption' }, { ar: 'زيادة الوزن', en: 'Increase weight' }], correct: 1, answer: { ar: 'الميل يوفر قوة مركزية إضافية من N، مما يسمح بسرعات أعلى', en: 'Banking provides additional centripetal force from N, allowing higher speeds' } },
+                { q: { ar: 'عجلة دوّارة (Centrifuge) بسرعة <span class="math">100,000 rpm</span> ونصف قطر <span class="math">0.1 m</span>. العجلة المركزية (g = 10):', en: 'A centrifuge at <span class="math">100,000 rpm</span> and radius <span class="math">0.1 m</span>. Centripetal acceleration:' }, options: [{ ar: '<span class="math">≈ 10⁶ m/s²</span>', en: '<span class="math">≈ 10⁶ m/s²</span>' }, { ar: '<span class="math">≈ 10⁴ m/s²</span>', en: '<span class="math">≈ 10⁴ m/s²</span>' }, { ar: '<span class="math">≈ 10⁸ m/s²</span>', en: '<span class="math">≈ 10⁸ m/s²</span>' }, { ar: '<span class="math">≈ 10² m/s²</span>', en: '<span class="math">≈ 10² m/s²</span>' }], correct: 0, answer: { ar: 'ω = 100,000 × 2π/60 ≈ 10,472 rad/s. a_c = ω²r ≈ (10⁴)² × 0.1 ≈ 10⁷ m/s² ≈ 10⁶ m/s²', en: 'ω = 100,000 × 2π/60 ≈ 10,472 rad/s. a_c = ω²r ≈ (10⁴)² × 0.1 ≈ 10⁷ m/s² ≈ 10⁶ m/s²' } }
+            ]
+        }
+    ]
+};
+
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+let examData;
+let correctAnswersMap = {};
+
+function prepareShuffledExam() {
+    examData = JSON.parse(JSON.stringify(originalExamData));
+    correctAnswersMap = {};
+    let globalIdx = 1;
+    examData.sections.forEach((section) => {
+        section.questions = shuffleArray(section.questions);
+        section.questions.forEach((q) => {
+            const optionsWithCorrect = q.options.map((opt, idx) => ({
+                option: opt,
+                isCorrect: idx === q.correct
+            }));
+            const shuffledOptions = shuffleArray(optionsWithCorrect);
+            q.options = shuffledOptions.map(o => o.option);
+            const newCorrectIndex = shuffledOptions.findIndex(o => o.isCorrect);
+            q.correct = newCorrectIndex;
+            correctAnswersMap[globalIdx] = String.fromCharCode(97 + newCorrectIndex);
+            globalIdx++;
+        });
+    });
+    console.log('✅ تم خلط الأسئلة والخيارات بنجاح');
+}
+
+function reshuffleExam() {
+    prepareShuffledExam();
+    renderExam();
+    document.querySelectorAll('input[type="radio"]:checked').forEach(r => r.checked = false);
+    document.getElementById('results-panel').classList.add('hidden');
+    document.querySelectorAll('.correct, .incorrect').forEach(el => {
+        el.classList.remove('correct', 'incorrect');
+    });
+    alert(currentLang === 'ar' ? '🔀 تم إعادة خلط الأسئلة والخيارات بنجاح!' : '🔀 Questions and options have been reshuffled successfully!');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+let currentLang = 'ar';
+let timeRemaining = 3600;
+let timerInterval;
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.body.classList.toggle('en-mode', lang === 'en');
+    document.querySelectorAll('[data-ar][data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+    });
+    renderExam();
+}
+
+function renderExam() {
+    const container = document.getElementById('exam-content');
+    const labels = {
+        ar: { option: ['أ', 'ب', 'ج', 'د'], answer: '✅ الإجابة:' },
+        en: { option: ['A', 'B', 'C', 'D'], answer: '✅ Answer:' }
+    };
+    const lbl = labels[currentLang];
+    const isRTL = currentLang === 'ar';
+    let html = '';
+    let globalIdx = 1;
+    examData.sections.forEach((section) => {
+        html += `<section class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-xl font-bold mb-4 text-emerald-700">${section.title[currentLang]}</h2>
+            <ol class="space-y-4 text-sm">`;
+        section.questions.forEach((q) => {
+            const borderSide = isRTL ? 'border-r-4 pr-4' : 'border-l-4 pl-4';
+            html += `<li class="${borderSide} border-emerald-500 py-2" id="q-${globalIdx}">
+                <strong>${globalIdx}.</strong> ${q.q[currentLang]}<br>`;
+            q.options.forEach((opt, oIdx) => {
+                const radioSide = isRTL ? 'mr-4 ml-2' : 'ml-4 mr-2';
+                html += `<label class="cursor-pointer block mt-1 ${isRTL ? 'mr-4' : 'ml-4'}">
+                    <input type="radio" name="q${globalIdx}" value="${String.fromCharCode(97 + oIdx)}" class="${radioSide}">
+                    ${lbl.option[oIdx]}) ${opt[currentLang]}
+                </label>`;
+            });
+            html += `<div class="answer-box text-green-700 mt-2 font-medium hidden">
+                ${lbl.answer} ${lbl.option[q.correct]}) ${q.options[q.correct][currentLang]} — ${q.answer[currentLang]}
+            </div></li>`;
+            globalIdx++;
+        });
+        html += `</ol></section>`;
+    });
+    container.innerHTML = html;
+}
+
+function startTimer() {
+    document.getElementById('timer-container').style.display = 'block';
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        const timerEl = document.getElementById('timer');
+        timerEl.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        if (timeRemaining <= 300) timerEl.classList.add('timer-warning');
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert(currentLang === 'ar' ? "انتهى الوقت! سيتم تسليم الامتحان تلقائياً." : "Time's up!");
+            gradeExam();
+        }
+    }, 1000);
+}
+
+function toggleAnswers() {
+    document.querySelectorAll('.answer-box').forEach(el => el.classList.toggle('hidden'));
+}
+
+function gradeExam() {
+    let correctCount = 0;
+    let sec1=0, sec2=0, sec3=0, sec4=0, sec5=0;
+    for (let i = 1; i <= 20; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const li = document.getElementById(`q-${i}`);
+        const correctAnswer = correctAnswersMap[i];
+        const isCorrect = selected && selected.value === correctAnswer;
+        if (isCorrect) {
+            correctCount++;
+            li.classList.add('correct');
+            li.classList.remove('incorrect');
+            if (i <= 4) sec1++;
+            else if (i <= 8) sec2++;
+            else if (i <= 12) sec3++;
+            else if (i <= 16) sec4++;
+            else sec5++;
+        } else {
+            li.classList.add('incorrect');
+            li.classList.remove('correct');
+        }
+    }
+    const score = (correctCount / 20) * 100;
+    const successRate = Math.round(score);
+    document.getElementById('res-total').textContent = `${Math.round(score)} / 100`;
+    document.getElementById('res-name').textContent = document.getElementById('studentName').value || (currentLang === 'ar' ? 'طالب' : 'Student');
+    document.getElementById('res-date').textContent = new Date().toLocaleDateString(currentLang === 'ar' ? 'ar-AE' : 'en-US');
+    document.getElementById('sec1-score').textContent = `${sec1}/4`;
+    document.getElementById('sec2-score').textContent = `${sec2}/4`;
+    document.getElementById('sec3-score').textContent = `${sec3}/4`;
+    document.getElementById('sec4-score').textContent = `${sec4}/4`;
+    document.getElementById('sec5-score').textContent = `${sec5}/4`;
+    const badge = document.getElementById('success-badge');
+    document.getElementById('success-percent').textContent = `${successRate}%`;
+    if (currentLang === 'ar') {
+        if (successRate >= 90) { badge.textContent = 'ممتاز'; badge.className = 'success-badge grade-excellent'; }
+        else if (successRate >= 75) { badge.textContent = 'جيد جداً'; badge.className = 'success-badge grade-good'; }
+        else if (successRate >= 50) { badge.textContent = 'جيد'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = 'يحتاج تحسين'; badge.className = 'success-badge grade-fail'; }
+    } else {
+        if (successRate >= 90) { badge.textContent = 'Excellent'; badge.className = 'success-badge grade-excellent'; }
+        else if (successRate >= 75) { badge.textContent = 'Very Good'; badge.className = 'success-badge grade-good'; }
+        else if (successRate >= 50) { badge.textContent = 'Good'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = 'Needs Improvement'; badge.className = 'success-badge grade-fail'; }
+    }
+    document.getElementById('results-panel').classList.remove('hidden');
+    document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('sendEmailBtn').classList.remove('hidden');
+}
+
+function sendResultsToEmail() {
+    const btn = document.getElementById('sendEmailBtn');
+    const status = document.getElementById('emailStatus');
+    btn.disabled = true;
+    btn.textContent = currentLang === 'ar' ? '⏳ جاري الإرسال...' : '⏳ Sending...';
+    const name = document.getElementById('studentName').value || 'N/A';
+    const studentClass = document.getElementById('studentClass').value || 'N/A';
+    const date = document.querySelector('input[type="text"]').value || new Date().toLocaleDateString();
+    const score = document.getElementById('res-total').textContent;
+    const successRate = document.getElementById('success-percent').textContent;
+    const badge = document.getElementById('success-badge').textContent;
+    const sectionNames = {
+        ar: ['أساسيات القوة المركزية', 'المنعطفات المسطحة', 'المنعطفات المائلة', 'الحركة الرأسية', 'تطبيقات Rotor & F1'],
+        en: ['Centripetal Basics', 'Flat Curves', 'Banked Curves', 'Vertical Motion', 'Rotor & F1 Apps']
+    };
+    const currentSectionNames = sectionNames[currentLang];
+    let answersHTML = `<div style="font-family: 'Segoe UI', Tahoma, Arial, sans-serif; direction: ${currentLang === 'ar' ? 'rtl' : 'ltr'};">
+        <div style="background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
+            <h2 style="margin: 0; font-size: 22px;">🎢 ${currentLang === 'ar' ? 'نتيجة امتحان القوة المركزية' : 'Centripetal Force Exam Result'}</h2>
+            <p style="margin: 5px 0 0 0; opacity: 0.9;">${currentLang === 'ar' ? 'الصف الثاني عشر المتقدم' : 'Grade 12 Advanced'}</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">🔀 ${currentLang === 'ar' ? 'تم خلط الأسئلة تلقائياً' : 'Questions were randomly shuffled'}</p>
+        </div>
+        <div style="background: #ecfdf5; padding: 15px; border: 1px solid #a7f3d0;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px; font-weight: bold; color: #047857;">${currentLang === 'ar' ? '👤 الاسم:' : '👤 Name:'}</td><td style="padding: 8px;">${name}</td>
+                <td style="padding: 8px; font-weight: bold; color: #047857;">${currentLang === 'ar' ? '🏫 الشعبة:' : '🏫 Class:'}</td><td style="padding: 8px;">${studentClass}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold; color: #047857;">${currentLang === 'ar' ? '📅 التاريخ:' : '📅 Date:'}</td><td style="padding: 8px;">${date}</td>
+                <td style="padding: 8px; font-weight: bold; color: #047857;">${currentLang === 'ar' ? '🏆 التقدير:' : '🏆 Grade:'}</td><td style="padding: 8px;">${badge}</td></tr>
+            </table>
+        </div>
+        <div style="background: white; padding: 20px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+            <div style="display: inline-block; margin: 0 15px;"><div style="font-size: 32px; font-weight: bold; color: #059669;">${score}</div><div style="color: #6b7280; font-size: 13px;">${currentLang === 'ar' ? 'الدرجة الكلية' : 'Total Score'}</div></div>
+            <div style="display: inline-block; margin: 0 15px;"><div style="font-size: 32px; font-weight: bold; color: #059669;">${successRate}%</div><div style="color: #6b7280; font-size: 13px;">${currentLang === 'ar' ? 'نسبة النجاح' : 'Success Rate'}</div></div>
+        </div>
+        <h3 style="background: #f3f4f6; padding: 12px; margin: 0; color: #1f2937; border-bottom: 2px solid #d1d5db;">📝 ${currentLang === 'ar' ? 'تفاصيل الإجابات' : 'Answer Details'}</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead><tr style="background: #059669; color: white;">
+                <th style="padding: 10px; border: 1px solid #047857; width: 8%;">#</th>
+                <th style="padding: 10px; border: 1px solid #047857; width: 32%;">${currentLang === 'ar' ? 'القسم' : 'Section'}</th>
+                <th style="padding: 10px; border: 1px solid #047857; width: 15%;">${currentLang === 'ar' ? 'الإجابة' : 'Answer'}</th>
+                <th style="padding: 10px; border: 1px solid #047857; width: 15%;">${currentLang === 'ar' ? 'الصحيحة' : 'Correct'}</th>
+                <th style="padding: 10px; border: 1px solid #047857; width: 15%;">${currentLang === 'ar' ? 'النتيجة' : 'Status'}</th>
+            </tr></thead><tbody>`;
+    let sectionScores = [0, 0, 0, 0, 0];
+    let sectionTotals = [4, 4, 4, 4, 4];
+    for (let i = 1; i <= 20; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const selectedValue = selected ? selected.value : '-';
+        const correctValue = correctAnswersMap[i];
+        const isCorrect = selectedValue === correctValue;
+        const sectionIndex = Math.floor((i - 1) / 4);
+        if (isCorrect) sectionScores[sectionIndex]++;
+        const rowBg = i % 2 === 0 ? '#f9fafb' : '#ffffff';
+        const statusBg = isCorrect ? '#dcfce7' : '#fee2e2';
+        const statusColor = isCorrect ? '#166534' : '#991b1b';
+        const statusIcon = isCorrect ? '✅' : '❌';
+        const statusText = isCorrect ? (currentLang === 'ar' ? 'صحيح' : 'Correct') : (currentLang === 'ar' ? 'خطأ' : 'Wrong');
+        answersHTML += `<tr style="background: ${rowBg};">
+            <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold;">${i}</td>
+            <td style="padding: 8px; border: 1px solid #e5e7eb;">${currentSectionNames[sectionIndex]}</td>
+            <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold;">${selectedValue.toUpperCase()}</td>
+            <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold; color: #059669;">${correctValue.toUpperCase()}</td>
+            <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; background: ${statusBg}; color: ${statusColor}; font-weight: bold;">${statusIcon} ${statusText}</td>
+        </tr>`;
+    }
+    answersHTML += `</tbody></table>
+        <h3 style="background: #f3f4f6; padding: 12px; margin: 0; color: #1f2937; border-bottom: 2px solid #d1d5db; border-top: 3px solid #059669;">📊 ${currentLang === 'ar' ? 'تفصيل الأداء' : 'Performance Breakdown'}</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead><tr style="background: #10b981; color: white;">
+                <th style="padding: 10px; border: 1px solid #059669;">${currentLang === 'ar' ? 'القسم' : 'Section'}</th>
+                <th style="padding: 10px; border: 1px solid #059669; width: 20%;">${currentLang === 'ar' ? 'النتيجة' : 'Score'}</th>
+                <th style="padding: 10px; border: 1px solid #059669; width: 20%;">${currentLang === 'ar' ? 'النسبة' : 'Percentage'}</th>
+            </tr></thead><tbody>`;
+    for (let i = 0; i < 5; i++) {
+        const percentage = Math.round((sectionScores[i] / sectionTotals[i]) * 100);
+        const barColor = percentage >= 75 ? '#10b981' : percentage >= 50 ? '#f59e0b' : '#ef4444';
+        const rowBg = i % 2 === 0 ? '#f9fafb' : '#ffffff';
+        answersHTML += `<tr style="background: ${rowBg};">
+            <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: 600;">${currentSectionNames[i]}</td>
+            <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold; color: #059669;">${sectionScores[i]} / ${sectionTotals[i]}</td>
+            <td style="padding: 10px; border: 1px solid #e5e7eb;">
+                <div style="background: #e5e7eb; border-radius: 10px; overflow: hidden; height: 20px; position: relative;">
+                    <div style="background: ${barColor}; width: ${percentage}%; height: 100%;"></div>
+                    <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: bold; color: #1f2937;">${percentage}%</span>
+                </div>
+            </td>
+        </tr>`;
+    }
+    answersHTML += `</tbody></table>
+        <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 15px; border-radius: 0 0 10px 10px; border-top: 2px solid #f59e0b;">
+            <p style="margin: 0; color: #78350f; text-align: center; font-size: 13px;">🎢 <strong>${currentLang === 'ar' ? 'ملاحظة:' : 'Note:'}</strong> ${currentLang === 'ar' ? 'تم إرسال هذا التقرير تلقائياً من منصة 4U التعليمية | Mr. Mohammed Hesham' : 'This report was automatically sent from 4U Educational Platform | Mr. Mohammed Hesham'}</p>
+        </div></div>`;
+    const templateParams = {
+        to_email: "mohammedhesham872@gmail.com",
+        student_name: name,
+        student_class: studentClass,
+        exam_date: date,
+        total_score: score,
+        success_rate: successRate,
+        grade: badge,
+        answers_table: answersHTML
+    };
+    emailjs.send("service_w15m64i", "template_5b0u2tq", templateParams)
+        .then(() => {
+            status.textContent = currentLang === 'ar' ? '✅ تم إرسال النتائج بنجاح!' : '✅ Results sent successfully!';
+            status.style.color = '#059669';
+            btn.textContent = currentLang === 'ar' ? '✓ تم الإرسال' : '✓ Sent';
+        })
+        .catch(err => {
+            status.textContent = currentLang === 'ar' ? '❌ فشل الإرسال' : '❌ Failed to send';
+            status.style.color = '#dc2626';
+            btn.disabled = false;
+            btn.textContent = currentLang === 'ar' ? '📧 إعادة المحاولة' : '📧 Retry Send';
+            console.error('EmailJS Error:', err);
+        });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    prepareShuffledExam();
+    renderExam();
+    startTimer();
+    console.log('🔀 تم خلط الأسئلة والخيارات عشوائياً!');
+});
+</script>
+</body>
+</html>
